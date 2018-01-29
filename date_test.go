@@ -15,7 +15,7 @@ import (
 var (
 
 	// databases
-	db map[string]*sql.DB
+	db = make(map[string]*sql.DB)
 
 	// test cases
 	d1 = Date{2001, time.March, 5}
