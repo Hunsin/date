@@ -45,7 +45,7 @@ func init() {
 		db[k], err = sql.Open(k, v)
 		if err != nil {
 			fmt.Print(err)
-			delete(db[k])
+			delete(db, k)
 		}
 	}
 }
@@ -129,9 +129,9 @@ func TestUnmarshalText(t *testing.T) {
 
 func TestScan(t *testing.T) {
 	q := map[string]string{
-		"mysql": "SELECT CURDATE();",
+		"mysql":    "SELECT CURDATE();",
 		"postgres": "SELECT now()::date;",
-		"sqlite3": "SELECT date('now');"
+		"sqlite3":  "SELECT date('now');",
 	}
 
 	d := Date{}
@@ -158,9 +158,9 @@ func TestString(t *testing.T) {
 
 func TestValue(t *testing.T) {
 	q := map[string]string{
-		"mysql": "SELECT DATE(?);",
+		"mysql":    "SELECT DATE(?);",
 		"postgres": "SELECT $1::date;",
-		"sqlite3": "SELECT date(?);"
+		"sqlite3":  "SELECT date(?);",
 	}
 
 	d := Date{}
