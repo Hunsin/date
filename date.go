@@ -83,6 +83,13 @@ func (d Date) String() string {
 	return fmt.Sprintf("%4d-%02d-%02d", d.Year, d.Month, d.Day)
 }
 
+// Sub returns the days d - t.
+func (d Date) Sub(t Date) int {
+	dt := time.Date(d.Year, d.Month, d.Day, 0, 0, 0, 0, time.UTC)
+	tt := time.Date(t.Year, t.Month, t.Day, 0, 0, 0, 0, time.UTC)
+	return int(dt.Sub(tt).Hours() / 24)
+}
+
 // Value implements the driver.Valuer interface.
 func (d Date) Value() (driver.Value, error) {
 	return d.String(), nil

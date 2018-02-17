@@ -156,6 +156,15 @@ func TestString(t *testing.T) {
 	}
 }
 
+func TestSub(t *testing.T) {
+	if d1.Sub(d2) != -3177 {
+		t.Error("Date.Sub failed. want: -3177, got:", d1.Sub(d2))
+	}
+	if d2.Sub(d1) != 3177 {
+		t.Error("Date.Sub failed. want: 3177, got:", d2.Sub(d1))
+	}
+}
+
 func TestValue(t *testing.T) {
 	q := map[string]string{
 		"mysql":    "SELECT DATE(?);",
