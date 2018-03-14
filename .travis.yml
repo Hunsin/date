@@ -3,6 +3,7 @@ language: go
 go:
   - 1.8.x
   - 1.9.x
+  - 1.10.x
 
 services:
   - mysql
@@ -11,11 +12,6 @@ services:
 before_install:
   - mysql -e 'CREATE DATABASE date_test;'
   - psql -c 'CREATE DATABASE date_test;' -U postgres
-
-before_script:
-  - go get github.com/go-sql-driver/mysql
-  - go get github.com/lib/pq
-  - go get github.com/mattn/go-sqlite3
 
 script:
   - go test -v -cover .

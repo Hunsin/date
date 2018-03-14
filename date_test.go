@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -45,7 +46,7 @@ func init() {
 		db[k], err = sql.Open(k, v)
 		if err != nil {
 			fmt.Print(err)
-			delete(db, k)
+			os.Exit(1)
 		}
 	}
 }
