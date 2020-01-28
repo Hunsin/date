@@ -45,37 +45,29 @@ func (d Date) MarshalText() ([]byte, error) {
 // UnmarshalText implements the encoding.TextUnmarshaler interface.
 // The formats it supports are "2006-01-02", "2006/01/02" and "02 Jan 2006".
 func (d *Date) UnmarshalText(b []byte) error {
-	var t time.Time
 	var err error
 
-	for _, f := range []string{"2006-01-02", "2006/01/02", "02 Jan 2006"} {
-		if t, err = time.Parse(f, string(b)); err == nil {
-			break
+	for _, layout := range []string{"2006-01-02", "2006/01/02", "02 Jan 2006"} {
+		if *d, err = Parse(layout, string(b)); err == nil {
+			return nil
 		}
 	}
-	if err != nil {
-		return fmt.Errorf(`Date.UnmarshalText: Unsupported format %s. Only "2006-01-02", "2006/01/02" and "02 Jan 2006" are supported`, b)
-	}
 
-	*d = Of(t)
-	return nil
+	return fmt.Errorf(`date: Unsupported format %s. Only "2006-01-02", "2006/01/02" and "02 Jan 2006" are supported`, b)
 }
 
 // Scan implements the sql.Scanner interface.
 func (d *Date) Scan(v interface{}) error {
 	switch s := v.(type) {
 	case time.Time:
-		*d = Date{Year: s.Year(), Month: s.Month(), Day: s.Day()}
+		*d = Of(s)
+		return nil
 	case []byte:
-		t, err := time.Parse("2006-01-02", string(s))
-		if err != nil {
-			return err
-		}
-		*d = Date{Year: t.Year(), Month: t.Month(), Day: t.Day()}
-	default:
-		return fmt.Errorf("date: Unsupport scanning type %T", v)
+		return d.UnmarshalText(s)
+	case string:
+		return d.UnmarshalText([]byte(s))
 	}
-	return nil
+	return fmt.Errorf("date: Unsupport scanning type %T", v)
 }
 
 // String returns a string of date in "YYYY-MM-DD" format.

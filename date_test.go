@@ -16,7 +16,7 @@ import (
 var (
 
 	// databases
-	db = make(map[string]*sql.DB)
+	dbs = make(map[string]*sql.DB)
 
 	// test cases
 	d1 = Date{2001, time.March, 5}
@@ -43,7 +43,7 @@ func init() {
 
 	var err error
 	for k, v := range cfg {
-		db[k], err = sql.Open(k, v)
+		dbs[k], err = sql.Open(k, v)
 		if err != nil {
 			fmt.Print(err)
 			os.Exit(1)
@@ -138,15 +138,26 @@ func TestScan(t *testing.T) {
 	d := Date{}
 	n := time.Now()
 
-	for k := range db {
-		err := db[k].QueryRow(q[k]).Scan(&d)
-		if err != nil {
+	for k, db := range dbs {
+		if err := db.QueryRow(q[k]).Scan(&d); err != nil {
 			t.Errorf("Scanning from %s exits with error: %v", k, err)
+			continue
 		}
 
 		if d.Year != n.Year() || d.Month != n.Month() || d.Day != n.Day() {
 			t.Errorf("Date.Scan failed: want: %s, got: %v", n.Format("2006-01-02"), d)
 		}
+	}
+
+	// log the data types returned by drivers
+	for k, db := range dbs {
+		var v interface{}
+		if err := db.QueryRow(q[k]).Scan(&v); err != nil {
+			t.Errorf("Scanning from %s exits with error: %v", k, err)
+			continue
+		}
+
+		t.Logf("Scanning from %s, data type: %T", k, v)
 	}
 }
 
@@ -175,9 +186,8 @@ func TestValue(t *testing.T) {
 
 	d := Date{}
 
-	for k := range db {
-		err := db[k].QueryRow(q[k], d1).Scan(&d)
-		if err != nil {
+	for k, db := range dbs {
+		if err := db.QueryRow(q[k], d1).Scan(&d); err != nil {
 			t.Errorf("Scanning from %s exits with error: %v", k, err)
 		}
 
